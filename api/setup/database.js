@@ -6,7 +6,7 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -16,9 +16,9 @@ export default async function handler(req, res) {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS certificates (
         id SERIAL PRIMARY KEY,
-        "certificateNumber" VARCHAR(255) UNIQUE NOT NULL,
-        "gemstoneType" VARCHAR(255) NOT NULL,
-        "caratWeight" VARCHAR(50) NOT NULL,
+        certificatenumber VARCHAR(255) UNIQUE NOT NULL,
+        gemstonetype VARCHAR(255) NOT NULL,
+        caratweight VARCHAR(50) NOT NULL,
         color VARCHAR(100) NOT NULL,
         clarity VARCHAR(50) NOT NULL,
         cut VARCHAR(100) NOT NULL,
@@ -27,9 +27,9 @@ export default async function handler(req, res) {
         fluorescence VARCHAR(50) NOT NULL,
         measurements VARCHAR(255) NOT NULL,
         origin VARCHAR(255) NOT NULL,
-        "issueDate" VARCHAR(50) NOT NULL,
-        "imageUrl" TEXT,
-        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        issuedate VARCHAR(50) NOT NULL,
+        imageurl TEXT,
+        createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         id SERIAL PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
-        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
@@ -53,9 +53,9 @@ export default async function handler(req, res) {
     // Insert sample certificates if not exists
     const sampleCertificates = [
       {
-        certificateNumber: 'GIE-2024-001234',
-        gemstoneType: 'Natural Diamond',
-        caratWeight: '1.25',
+        certificatenumber: 'GIE-2024-001234',
+        gemstonetype: 'Natural Diamond',
+        caratweight: '1.25',
         color: 'D',
         clarity: 'VVS1',
         cut: 'Excellent',
@@ -64,12 +64,13 @@ export default async function handler(req, res) {
         fluorescence: 'None',
         measurements: '6.85 x 6.91 x 4.24 mm',
         origin: 'Natural',
-        issueDate: '2024-01-15'
+        issuedate: '2024-01-15',
+        imageurl: '/diamond-sample.jpg'
       },
       {
-        certificateNumber: 'GIE-2024-001235',
-        gemstoneType: 'Ruby',
-        caratWeight: '2.15',
+        certificatenumber: 'GIE-2024-001235',
+        gemstonetype: 'Ruby',
+        caratweight: '2.15',
         color: 'Pigeon Blood Red',
         clarity: 'VS1',
         cut: 'Oval',
@@ -78,12 +79,13 @@ export default async function handler(req, res) {
         fluorescence: 'None',
         measurements: '8.12 x 6.45 x 4.21 mm',
         origin: 'Burma (Myanmar)',
-        issueDate: '2024-01-20'
+        issuedate: '2024-01-20',
+        imageurl: '/ruby-sample.jpg'
       },
       {
-        certificateNumber: 'GIE-2024-001236',
-        gemstoneType: 'Sapphire',
-        caratWeight: '3.45',
+        certificatenumber: 'GIE-2024-001236',
+        gemstonetype: 'Sapphire',
+        caratweight: '3.45',
         color: 'Royal Blue',
         clarity: 'VVS2',
         cut: 'Cushion',
@@ -92,22 +94,23 @@ export default async function handler(req, res) {
         fluorescence: 'None',
         measurements: '9.15 x 8.92 x 5.78 mm',
         origin: 'Kashmir',
-        issueDate: '2024-02-01'
+        issuedate: '2024-02-01',
+        imageurl: '/sapphire-sample.jpg'
       }
     ];
 
     for (const cert of sampleCertificates) {
       await pool.query(`
         INSERT INTO certificates (
-          "certificateNumber", "gemstoneType", "caratWeight", "color", 
-          "clarity", "cut", "polish", "symmetry", "fluorescence", 
-          "measurements", "origin", "issueDate"
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
-        ON CONFLICT ("certificateNumber") DO NOTHING
+          certificatenumber, gemstonetype, caratweight, color, 
+          clarity, cut, polish, symmetry, fluorescence, 
+          measurements, origin, issuedate, imageurl
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) 
+        ON CONFLICT (certificatenumber) DO NOTHING
       `, [
-        cert.certificateNumber, cert.gemstoneType, cert.caratWeight, cert.color,
+        cert.certificatenumber, cert.gemstonetype, cert.caratweight, cert.color,
         cert.clarity, cert.cut, cert.polish, cert.symmetry, cert.fluorescence,
-        cert.measurements, cert.origin, cert.issueDate
+        cert.measurements, cert.origin, cert.issuedate, cert.imageurl
       ]);
     }
 
